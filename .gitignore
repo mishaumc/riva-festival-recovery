@@ -1,0 +1,14 @@
+﻿# OS files
+Thumbs.db
+.DS_Store
+
+# Archives too large for GitHub (use Releases instead)
+*.tar
+
+# Python
+__pycache__/
+*.pyc
+
+# IDE
+.vscode/
+.idea/
