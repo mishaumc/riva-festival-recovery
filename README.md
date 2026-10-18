@@ -59,8 +59,7 @@ This repository provides three levels of firmware recovery:
 |-------|--------|------|----------|
 | A | OTA download script | ~79 MB | `scripts/download_ota.sh` |
 | B | Delta patch (5 critical files) | 5.5 MB | `patches/delta-chrome-5files.tar.gz` |
-| C | Full system image | 75 MB | [GitHub Releases](../../releases) |
-
+| C | Full system image | ~75 MB | [GitHub Releases](https://github.com/mishaumc/riva-festival-recovery/releases) |
 **Recommended:** Start with Level A (fully legal, downloads from public OTA server). Use Level B if OTA is unavailable. Level C is a last resort.
 
 ## Documentation
