@@ -1,4 +1,9 @@
 # RIVA Festival Cast Recovery
+![License](https://img.shields.io/badge/License-MIT-yellow.svg)
+![Release](https://img.shields.io/github/v/release/mishaumc/riva-festival-recovery?label=Latest%20Release)
+![Status](https://img.shields.io/badge/Status-Stable-green)
+
+> ⚠️ **WARNING:** BusyBox on Libre Wireless LS9 has strict limitations. **NEVER** use `chown -R` (it will fail with "No such user '-R'"). Always use individual `chown` commands as specified in Stage 7 of the Recovery Guide.
 
 **Your RIVA Festival speaker lost Google Cast after a factory reset or firmware update? This guide will fix it.**
 
