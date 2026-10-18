@@ -1,0 +1,11 @@
+blank_issues_enabled: true
+contact_links:
+  - name: 📖 Recovery Guide v2.0
+    url: https://github.com/mishaumc/riva-festival-recovery/blob/main/RECOVERY_GUIDE_v2.md
+    about: Please read the step-by-step recovery guide before creating an issue.
+  - name: 🔍 Troubleshooting & FAQ
+    url: https://github.com/mishaumc/riva-festival-recovery/blob/main/TROUBLESHOOTING.md
+    about: Check the decision tree and answers to frequently asked questions.
+  - name: 🧬 Technical DNA
+    url: https://github.com/mishaumc/riva-festival-recovery/blob/main/DNA.md
+    about: Full technical knowledge base with device specs, commands, and file sizes.
