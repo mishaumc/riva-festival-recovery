@@ -1,7 +1,8 @@
-﻿# RIVA Festival Recovery Project — DNA
+# RIVA Festival Recovery Project — DNA
 
 ## 1. Project Identity
-- **Repository:** riva-festival-recovery (GitHub)
+- **Repository:** https://github.com/mishaumc/riva-festival-recovery
+- **Release:** https://github.com/mishaumc/riva-festival-recovery/releases/tag/v2.0
 - **Purpose:** Restore full functionality to RIVA Festival smart speakers with broken Google Cast, including mobile streaming (SoundCloud, Spotify, YouTube from phones)
 - **Author:** Community reverse-engineering effort, acknowledged by RIVA Audio engineering (Dylan, technical engineer)
 - **License:** Recovery tools and documentation are MIT. All firmware binaries belong to RIVA Audio / Libre Wireless / Google LLC.
@@ -73,6 +74,9 @@ Password: empty (press Enter).
 ### Kill Cast Processes
 killall -9 cast_shell process_manager castlucicomm
 
+### Quick Diagnostics on Speaker
+Run scripts/verify_chrome.sh from the repository directly on the speaker via SSH to automatically check all critical file sizes and permissions.
+
 ### Eureka.conf Patch (Python from Windows PowerShell)
 python -c "import subprocess, json; raw = subprocess.check_output(['ssh', '-o', 'HostKeyAlgorithms=+ssh-rsa', '-o', 'PubkeyAcceptedAlgorithms=+ssh-rsa', 'root@<IP>', 'cat /lsync/data1/chrome/.eureka.conf']); data = json.loads(raw.decode('utf-8')); data['tos-accepted'] = True; data['setup-stats'] = {'num-check-connectivity': 0, 'num-connect-wifi': 0, 'num-connected-wifi-not-saved': 0, 'num-initial-eureka-info': 0, 'num-obtain-ip': 0, 'num-weave-pairing': 0, 'once-reach-connected': 1, 'once-reach-gaia-required': 1}; new_json = json.dumps(data, separators=(',', ':')); p = subprocess.Popen(['ssh', '-o', 'HostKeyAlgorithms=+ssh-rsa', '-o', 'PubkeyAcceptedAlgorithms=+ssh-rsa', 'root@<IP>', 'cat > /lsync/data1/chrome/.eureka.conf'], stdin=subprocess.PIPE); p.communicate(input=new_json.encode('utf-8')); print('PATCH COMPLETED')"
 
@@ -83,7 +87,8 @@ python -c "import subprocess; subprocess.call(['ssh', '-o', 'HostKeyAlgorithms=+
 printf 'ctrl_interface=/data/wifi\nupdate_config=1\nnetwork={\n\tssid="%s"\n\tpsk="%s"\n\tkey_mgmt=WPA-PSK\n}\n' "SSID" "PASSWORD" > /data/wifi/wpa_supplicant.conf && sync
 
 ### Apply Delta Patch from PC
-python -c "import subprocess; p1 = subprocess.Popen(['tar', '-xzf', 'delta-chrome-5files.tar.gz', '-C', '.'], stdout=subprocess.PIPE); p2 = subprocess.Popen(['ssh', '-o', 'HostKeyAlgorithms=+ssh-rsa', '-o', 'PubkeyAcceptedAlgorithms=+ssh-rsa', 'root@<IP>', 'cd /system/chrome && tar -xzf -'], stdin=p1.stdout); p2.communicate()"
+Download delta-chrome-5files.tar.gz from https://github.com/mishaumc/riva-festival-recovery/blob/main/patches/delta-chrome-5files.tar.gz then:
+python -c "import subprocess; p = subprocess.Popen(['ssh', '-o', 'HostKeyAlgorithms=+ssh-rsa', '-o', 'PubkeyAcceptedAlgorithms=+ssh-rsa', 'root@<IP>', 'killall -9 cast_shell process_manager castlucicomm; cd /system/chrome && tar -xzf -'], stdin=open('delta-chrome-5files.tar.gz','rb')); p.communicate(); print('DELTA APPLIED')"
 
 ## 7. Known Pitfalls
 - chown -R does NOT work on LS9 BusyBox — gives "No such user '-R'". Use individual chown per file.
@@ -98,9 +103,10 @@ python -c "import subprocess; p1 = subprocess.Popen(['tar', '-xzf', 'delta-chrom
 ## 8. Firmware Distribution Strategy (Three Levels)
 
 ### Level A — OTA Download (Fully Legal)
-Script downloads from public server:
+Run scripts/download_ota.sh from the repository. Downloads from public server:
 - http://dev.hansong-china.com/OTA/Riva/Festival/83_IMAGE_NETWORK (~36 MB, SHA256 6F144E99...)
 - http://dev.hansong-china.com/OTA/Riva/Festival/cast_receiver_signed_1.52at.272222_NEON_GM2.zip (~43 MB, SHA256 7E13F477...)
+Script includes HTTP error handling (-f flag), minimum file size verification, and SHA256 output for manual verification.
 
 ### Level B — Delta Patch (5.5 MB)
 Only files that differ from factory and are NOT in Cast OTA:
@@ -109,27 +115,46 @@ Only files that differ from factory and are NOT in Cast OTA:
 - chrome-sandbox (22,176 bytes)
 - assets/cast_shell.pak (5,210,730 bytes)
 - chromecast_locales/ (106 files, ~1.1 MB)
-File: delta-chrome-5files.tar.gz
+File: patches/delta-chrome-5files.tar.gz in the repository
 
 ### Level C — Full Image (75.2 MB)
-Complete /system/chrome/ tar archive. GitHub Release only.
+Complete /system/chrome/ tar archive (180 files, verified against working reference device).
+Download from: https://github.com/mishaumc/riva-festival-recovery/releases/tag/v2.0
 File: riva-festival-chrome-full.tar
 Disclaimer: For restoration of legally owned RIVA Festival devices only. All rights belong to RIVA Audio / Libre Wireless / Google LLC.
 
-## 9. Network Topology (Reference)
+## 9. Repository Structure
+
+https://github.com/mishaumc/riva-festival-recovery
+
+- README.md — Main page with quick start
+- RECOVERY_GUIDE_v2.md — 15-stage recovery procedure
+- TROUBLESHOOTING.md — Decision tree and FAQ
+- STREAMING_SERVICES.md — Protocol reference (Cast, AirPlay, Spotify, DLNA, Tidal, RAAT, Snapcast, Bluetooth)
+- DNA.md — This file (technical knowledge base)
+- DISCLAIMER.md — Legal information
+- LICENSE — MIT
+- scripts/download_ota.sh — Level A: OTA downloader with integrity checks
+- scripts/verify_chrome.sh — Diagnostic script to run on speaker via SSH
+- patches/delta-chrome-5files.tar.gz — Level B: 5.5 MB delta patch
+- .github/ISSUE_TEMPLATE/ — Bug report and help request templates
+- .gitattributes — Git LFS configuration for binary files
+- Releases/v2.0 — Level C: full 75.2 MB system image
+
+## 10. Network Topology (Reference)
 - Defective speaker (recovered): 192.168.0.102, SSID Home (2.4 GHz)
 - Healthy speaker: 192.168.0.103, SSID Home_5G (5 GHz)
 - Both IPs DHCP-reserved in router
 - mDNS requires same Wi-Fi band or IGMP Snooping enabled
 
-## 10. Recovery Workflow Summary (15 Stages)
+## 11. Recovery Workflow Summary (15 Stages)
 1. SSH access verification
 2. Diagnostic data collection (.eureka.conf, initial_error, file sizes)
 3. Network alignment (same Wi-Fi band)
-4. [NEW] Eureka.conf patch (Python, kill processes first)
+4. Eureka.conf patch (Python, kill processes first)
 5. Wi-Fi configuration (Android: write wpa_supplicant.conf via SSH)
-6. [NEW] Chrome binary sync (full or delta)
-7. [NEW] Post-sync permissions fix and reboot
+6. Chrome binary sync (full or delta)
+7. Post-sync permissions fix and reboot
 8. Cold boot verification
 9. Cast discovery test (Chrome, YouTube, mobile)
 10. Streaming test (SoundCloud, Spotify)
@@ -139,8 +164,9 @@ Disclaimer: For restoration of legally owned RIVA Festival devices only. All rig
 14. Persistence test (power cycle, 24h)
 15. Documentation and backup
 
-## 11. Contacts and References
+## 12. Contacts and References
 - **Dylan** — RIVA Audio technical engineer (acknowledged this work, forwarding to engineering team)
 - **OTA Server:** http://dev.hansong-china.com/OTA/Riva/Festival/
+- **GitHub:** https://github.com/mishaumc/riva-festival-recovery
 - **RIVA VOICE App:** iOS/Android, used for initial setup and multi-room
 - **Libre Wireless LS9 SDK:** Proprietary, not publicly available
