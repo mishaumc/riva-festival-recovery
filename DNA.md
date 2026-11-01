@@ -170,3 +170,11 @@ https://github.com/mishaumc/riva-festival-recovery
 - **GitHub:** https://github.com/mishaumc/riva-festival-recovery
 - **RIVA VOICE App:** iOS/Android, used for initial setup and multi-room
 - **Libre Wireless LS9 SDK:** Proprietary, not publicly available
+
+
+## 13. Factory Reset & Hardware Persistence (CRITICAL)
+- **Permanent Fix:** Replacing /system/chrome/ binaries (Stage 6) is a PERMANENT repair.
+- **Hardware Reset Behavior:** Performing a manual button-press reset (Previous Track + Play/Pause) wipes /data/ and /lsync/data1/, but **DOES NOT touch /system/**.
+- **Post-Reset Recovery:** Because cast_shell no longer crashes after the repair, performing a button reset allows the speaker to cleanly enter standard setup mode (VAC).
+- **No SSH Required After Fix:** A repaired speaker can be re-added to Wi-Fi via standard consumer methods (iOS 'Add AirPlay Speaker' menu or Google Home app) natively out-of-the-box.
+- **SSH Repeat Necessity:** Stage 4, 5, and 6 NEVER need to be repeated after a hardware reset. SSH is a one-time operation for initial recovery only.
